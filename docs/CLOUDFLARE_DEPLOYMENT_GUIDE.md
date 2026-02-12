@@ -42,6 +42,7 @@ This guide explains how to deploy SwapPuzzle with Cloudflare Pages + Functions +
 - Build fails: verify Node version and build command.
 - API fails: verify binding names exactly match code usage.
 - DB errors: check migrations ran and schema exists.
+- `wrangler versions upload` fails with “Missing entry-point”: add a `wrangler.jsonc` with `main` (Worker) or `assets.directory` (static assets).
 
 ## 7. Next Step (Recommended)
 
