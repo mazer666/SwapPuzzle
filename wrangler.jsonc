@@ -1,5 +1,9 @@
 {
   "name": "swappuzzle",
   "compatibility_date": "2026-02-12",
-  "main": "src/index.ts"
+  "compatibility_flags": ["nodejs_compat"],
+  "main": ".vercel/output/static/_worker.js",
+  "assets": {
+    "directory": ".vercel/output/static"
+  }
 }
