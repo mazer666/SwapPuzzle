@@ -7,6 +7,7 @@ import {
   createImageToken,
   isSolved,
   swapTiles,
+  type ContentProfile,
   type GamePuzzle,
   type Language,
   type Tile,
@@ -16,6 +17,28 @@ import {
 type Difficulty = 'relaxed' | 'balanced' | 'challenge';
 
 type Dictionary = Record<Language, Record<string, string>>;
+
+type Settings = {
+  language: Language;
+  size: 5 | 7 | 9;
+  tileMode: TileMode;
+  difficulty: Difficulty;
+  profile: ContentProfile;
+  failAtZero: boolean;
+  continueAtZero: boolean;
+};
+
+const SETTINGS_KEY = 'swappuzzle-settings-v1';
+
+const defaultSettings: Settings = {
+  language: 'en',
+  size: 5,
+  tileMode: 'letters',
+  difficulty: 'balanced',
+  profile: 'family',
+  failAtZero: true,
+  continueAtZero: false
+};
 
 const copy: Dictionary = {
   en: {
@@ -27,12 +50,14 @@ const copy: Dictionary = {
     start: 'New Puzzle',
     swapsLeft: 'Swaps left',
     solved: 'Solved! 🎉',
+    gameOver: 'No swaps left. Puzzle failed.',
     cluesAcross: 'Across clues',
     cluesDown: 'Down clues',
     hint: 'Hint',
     leaderboard: 'Local best score',
     profile: 'Profile',
-    family: 'Family-safe mode'
+    failAtZero: 'Lose when swaps reach zero',
+    continueAtZero: 'Allow continue after zero swaps'
   },
   de: {
     title: 'SwapPuzzle MVP',
@@ -43,12 +68,14 @@ const copy: Dictionary = {
     start: 'Neues Rätsel',
     swapsLeft: 'Verbleibende Züge',
     solved: 'Gelöst! 🎉',
+    gameOver: 'Keine Züge mehr. Runde verloren.',
     cluesAcross: 'Hinweise waagrecht',
     cluesDown: 'Hinweise senkrecht',
     hint: 'Tipp',
     leaderboard: 'Lokale Bestpunktzahl',
     profile: 'Profil',
-    family: 'Familienmodus'
+    failAtZero: 'Bei 0 Zügen verlieren',
+    continueAtZero: 'Nach 0 Zügen weiterspielen'
   },
   fr: {
     title: 'SwapPuzzle MVP',
@@ -59,12 +86,14 @@ const copy: Dictionary = {
     start: 'Nouveau puzzle',
     swapsLeft: 'Échanges restants',
     solved: 'Résolu ! 🎉',
+    gameOver: 'Plus d’échanges. Partie perdue.',
     cluesAcross: 'Indices horizontaux',
     cluesDown: 'Indices verticaux',
     hint: 'Indice',
     leaderboard: 'Meilleur score local',
     profile: 'Profil',
-    family: 'Mode famille'
+    failAtZero: 'Perdre à zéro échange',
+    continueAtZero: 'Continuer après zéro échange'
   },
   es: {
     title: 'SwapPuzzle MVP',
@@ -75,12 +104,14 @@ const copy: Dictionary = {
     start: 'Nuevo puzzle',
     swapsLeft: 'Intercambios restantes',
     solved: '¡Resuelto! 🎉',
+    gameOver: 'Sin intercambios. Partida perdida.',
     cluesAcross: 'Pistas horizontales',
     cluesDown: 'Pistas verticales',
     hint: 'Pista',
     leaderboard: 'Mejor puntuación local',
     profile: 'Perfil',
-    family: 'Modo familiar'
+    failAtZero: 'Perder con cero intercambios',
+    continueAtZero: 'Continuar después de cero'
   }
 };
 
@@ -105,51 +136,81 @@ function readBestScore(language: Language): number {
   return Number(localStorage.getItem(`swappuzzle-best-${language}`) ?? 0);
 }
 
+function readSettings(): Settings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return defaultSettings;
+    return { ...defaultSettings, ...(JSON.parse(raw) as Partial<Settings>) };
+  } catch {
+    return defaultSettings;
+  }
+}
+
+function saveSettings(settings: Settings) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
 export function SwapPuzzleGame() {
-  const [language, setLanguage] = useState<Language>('en');
-  const [size, setSize] = useState<5 | 7 | 9>(5);
-  const [tileMode, setTileMode] = useState<TileMode>('letters');
-  const [difficulty, setDifficulty] = useState<Difficulty>('balanced');
-  const [familyMode, setFamilyMode] = useState(true);
-  const [puzzle, setPuzzle] = useState<GamePuzzle>(() => buildPuzzle('en', 5));
+  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [puzzle, setPuzzle] = useState<GamePuzzle>(() => buildPuzzle(defaultSettings.language, defaultSettings.size, defaultSettings.profile));
   const [tiles, setTiles] = useState<Tile[]>(puzzle.shuffledTiles);
   const [selectedTile, setSelectedTile] = useState<number | null>(null);
-  const [swapsLeft, setSwapsLeft] = useState(swapsForDifficulty('balanced', 5));
+  const [swapsLeft, setSwapsLeft] = useState(swapsForDifficulty(defaultSettings.difficulty, defaultSettings.size));
   const [acrossHintIndex, setAcrossHintIndex] = useState(0);
   const [downHintIndex, setDownHintIndex] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
 
-  const t = copy[language];
-
+  const t = copy[settings.language];
   const solved = useMemo(() => isSolved(tiles, puzzle.solutionTiles), [tiles, puzzle.solutionTiles]);
 
   useEffect(() => {
-    setBestScore(readBestScore(language));
-  }, [language]);
+    const loaded = readSettings();
+    setSettings(loaded);
+    setBestScore(readBestScore(loaded.language));
+    setSwapsLeft(swapsForDifficulty(loaded.difficulty, loaded.size));
+  }, []);
+
+  useEffect(() => {
+    saveSettings(settings);
+    setBestScore(readBestScore(settings.language));
+  }, [settings]);
 
   useEffect(() => {
     if (!solved) return;
-    const score = Math.max(0, swapsLeft) + size * 50;
-    saveBestScore(language, score);
-    setBestScore(readBestScore(language));
-  }, [solved, swapsLeft, size, language]);
+    const score = Math.max(0, swapsLeft) + settings.size * 50;
+    saveBestScore(settings.language, score);
+    setBestScore(readBestScore(settings.language));
+  }, [solved, swapsLeft, settings.language, settings.size]);
+
+  useEffect(() => {
+    const shouldGameOver =
+      !solved &&
+      settings.difficulty !== 'relaxed' &&
+      settings.failAtZero &&
+      !settings.continueAtZero &&
+      swapsLeft <= 0;
+    setGameOver(shouldGameOver);
+  }, [solved, settings.difficulty, settings.failAtZero, settings.continueAtZero, swapsLeft]);
 
   const startNewPuzzle = async () => {
     setLoading(true);
+    setGameOver(false);
     try {
-      const response = await fetch(`/api/puzzle?lang=${language}&size=${size}`);
+      const response = await fetch(
+        `/api/puzzle?lang=${settings.language}&size=${settings.size}&profile=${settings.profile}`
+      );
       const next = (await response.json()) as GamePuzzle;
       setPuzzle(next);
       setTiles(next.shuffledTiles);
-    } catch (_error) {
-      // If API is unavailable, we gracefully fall back to local generation so the game remains playable.
-      const fallback = buildPuzzle(language, size);
+    } catch {
+      const fallback = buildPuzzle(settings.language, settings.size, settings.profile);
       setPuzzle(fallback);
       setTiles(fallback.shuffledTiles);
     } finally {
       setSelectedTile(null);
-      setSwapsLeft(swapsForDifficulty(difficulty, size));
+      setSwapsLeft(swapsForDifficulty(settings.difficulty, settings.size));
       setAcrossHintIndex(0);
       setDownHintIndex(0);
       setLoading(false);
@@ -157,24 +218,34 @@ export function SwapPuzzleGame() {
   };
 
   const onTileClick = (index: number) => {
-    if (swapsLeft <= 0 || solved) return;
+    if (gameOver || solved) return;
+    if (settings.difficulty !== 'relaxed' && swapsLeft <= 0 && !settings.continueAtZero) return;
+
     if (selectedTile === null) {
       setSelectedTile(index);
       return;
     }
+
     const nextTiles = swapTiles(tiles, selectedTile, index);
     setTiles(nextTiles);
     setSelectedTile(null);
-    setSwapsLeft((prev) => prev - 1);
+
+    if (settings.difficulty !== 'relaxed') {
+      setSwapsLeft((prev) => prev - 1);
+    }
   };
 
   return (
     <main>
       <h1>{t.title}</h1>
+
       <section className="panel controls">
         <label>
           {t.language}
-          <select value={language} onChange={(e) => setLanguage(e.target.value as Language)}>
+          <select
+            value={settings.language}
+            onChange={(e) => setSettings((prev) => ({ ...prev, language: e.target.value as Language }))}
+          >
             <option value="en">English</option>
             <option value="de">Deutsch</option>
             <option value="fr">Français</option>
@@ -184,7 +255,10 @@ export function SwapPuzzleGame() {
 
         <label>
           {t.board}
-          <select value={size} onChange={(e) => setSize(Number(e.target.value) as 5 | 7 | 9)}>
+          <select
+            value={settings.size}
+            onChange={(e) => setSettings((prev) => ({ ...prev, size: Number(e.target.value) as 5 | 7 | 9 }))}
+          >
             {boardSizes.map((boardSize) => (
               <option key={boardSize} value={boardSize}>
                 {boardSize}x{boardSize}
@@ -195,7 +269,10 @@ export function SwapPuzzleGame() {
 
         <label>
           {t.mode}
-          <select value={tileMode} onChange={(e) => setTileMode(e.target.value as TileMode)}>
+          <select
+            value={settings.tileMode}
+            onChange={(e) => setSettings((prev) => ({ ...prev, tileMode: e.target.value as TileMode }))}
+          >
             {tileModeOptions.map((mode) => (
               <option key={mode} value={mode}>
                 {mode}
@@ -206,7 +283,10 @@ export function SwapPuzzleGame() {
 
         <label>
           {t.difficulty}
-          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
+          <select
+            value={settings.difficulty}
+            onChange={(e) => setSettings((prev) => ({ ...prev, difficulty: e.target.value as Difficulty }))}
+          >
             <option value="relaxed">Relaxed</option>
             <option value="balanced">Balanced</option>
             <option value="challenge">Challenge</option>
@@ -215,9 +295,35 @@ export function SwapPuzzleGame() {
 
         <label>
           {t.profile}
-          <select value={familyMode ? 'family' : 'open'} onChange={(e) => setFamilyMode(e.target.value === 'family')}>
-            <option value="family">{t.family}</option>
-            <option value="open">Standard</option>
+          <select
+            value={settings.profile}
+            onChange={(e) => setSettings((prev) => ({ ...prev, profile: e.target.value as ContentProfile }))}
+          >
+            <option value="standard">standard</option>
+            <option value="family">family</option>
+            <option value="kid">kid</option>
+          </select>
+        </label>
+
+        <label>
+          {t.failAtZero}
+          <select
+            value={settings.failAtZero ? 'yes' : 'no'}
+            onChange={(e) => setSettings((prev) => ({ ...prev, failAtZero: e.target.value === 'yes' }))}
+          >
+            <option value="yes">yes</option>
+            <option value="no">no</option>
+          </select>
+        </label>
+
+        <label>
+          {t.continueAtZero}
+          <select
+            value={settings.continueAtZero ? 'yes' : 'no'}
+            onChange={(e) => setSettings((prev) => ({ ...prev, continueAtZero: e.target.value === 'yes' }))}
+          >
+            <option value="yes">yes</option>
+            <option value="no">no</option>
           </select>
         </label>
 
@@ -227,11 +333,13 @@ export function SwapPuzzleGame() {
       </section>
 
       <section className="panel">
-        <p className="status">{t.swapsLeft}: {difficulty === 'relaxed' ? '∞' : swapsLeft}</p>
+        <p className="status">
+          {t.swapsLeft}: {settings.difficulty === 'relaxed' ? '∞' : swapsLeft}
+        </p>
         {solved ? <p className="status">{t.solved}</p> : null}
-        {!solved && swapsLeft <= 0 && difficulty !== 'relaxed' ? <p className="status">No swaps left.</p> : null}
+        {gameOver ? <p className="status">{t.gameOver}</p> : null}
 
-        <div className="board" style={{ gridTemplateColumns: `repeat(${size}, 48px)` }}>
+        <div className="board" style={{ gridTemplateColumns: `repeat(${settings.size}, 48px)` }}>
           {tiles.map((tile, index) => (
             <button
               type="button"
@@ -240,7 +348,7 @@ export function SwapPuzzleGame() {
               key={`${tile.id}-${index}`}
               aria-label={`Tile ${index + 1}`}
             >
-              {tileMode === 'letters' ? (
+              {settings.tileMode === 'letters' ? (
                 tile.value
               ) : (
                 <Image
@@ -260,7 +368,11 @@ export function SwapPuzzleGame() {
         <article className="panel">
           <h2>{t.cluesAcross}</h2>
           <p>{puzzle.acrossClues[acrossHintIndex]}</p>
-          <button className="secondary" type="button" onClick={() => setAcrossHintIndex((prev) => (prev + 1) % puzzle.acrossClues.length)}>
+          <button
+            className="secondary"
+            type="button"
+            onClick={() => setAcrossHintIndex((prev) => (prev + 1) % puzzle.acrossClues.length)}
+          >
             {t.hint}
           </button>
         </article>
@@ -268,16 +380,22 @@ export function SwapPuzzleGame() {
         <article className="panel">
           <h2>{t.cluesDown}</h2>
           <p>{puzzle.downClues[downHintIndex]}</p>
-          <button className="secondary" type="button" onClick={() => setDownHintIndex((prev) => (prev + 1) % puzzle.downClues.length)}>
+          <button
+            className="secondary"
+            type="button"
+            onClick={() => setDownHintIndex((prev) => (prev + 1) % puzzle.downClues.length)}
+          >
             {t.hint}
           </button>
         </article>
       </section>
 
       <section className="panel" style={{ marginTop: '1rem' }}>
-        <strong>{t.leaderboard}: {bestScore}</strong>
+        <strong>
+          {t.leaderboard}: {bestScore}
+        </strong>
         <p style={{ marginBottom: 0 }}>
-          Mode: {difficulty} · {familyMode ? t.family : 'standard'}
+          Mode: {settings.difficulty} · {settings.profile} · {settings.tileMode}
         </p>
       </section>
     </main>

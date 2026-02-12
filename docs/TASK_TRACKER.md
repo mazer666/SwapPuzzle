@@ -28,7 +28,7 @@ Use this file to track delivery progress transparently.
 - [x] Implement swap-any-two mechanic
 - [x] Implement across/down clue engine
 - [x] Implement hint behavior (fixed clue-level hints)
-- [ ] Implement win/lose/continue rule variants
+- [x] Implement win/lose/continue rule variants
 - [x] Implement local leaderboard and storage
 
 ## Epic D - Puzzle Intelligence
@@ -37,7 +37,7 @@ Use this file to track delivery progress transparently.
 - [ ] Add solvability and uniqueness quality gates
 - [ ] Add difficulty rating pipeline
 - [ ] Integrate multilingual puzzle datasets (EN/DE/FR/ES)
-- [ ] Add family/kid content filtering
+- [~] Add family/kid content filtering
 
 ## Epic E - Quality and Compliance
 

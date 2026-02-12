@@ -9,6 +9,8 @@ SwapPuzzle is a multilingual web puzzle game prototype where players solve a boa
 - Multiple board sizes: 5x5, 7x7, 9x9.
 - Tile modes: letters and image tiles.
 - Across/down clue panels with rotating hints.
+- Win/lose behavior options (fail-at-zero and continue-at-zero).
+- Profile options (standard/family/kid) persisted in local settings.
 - Local best-score storage.
 - Language options: EN/DE/FR/ES.
 - CI workflow (lint, test, build).

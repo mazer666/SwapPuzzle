@@ -1,5 +1,6 @@
 export type Language = 'en' | 'de' | 'fr' | 'es';
 export type TileMode = 'letters' | 'images';
+export type ContentProfile = 'standard' | 'family' | 'kid';
 
 export type PuzzleSeed = {
   language: Language;
@@ -17,6 +18,7 @@ export type Tile = {
 export type GamePuzzle = {
   language: Language;
   size: 5 | 7 | 9;
+  profile: ContentProfile;
   acrossClues: string[];
   downClues: string[];
   solutionTiles: Tile[];
@@ -36,13 +38,7 @@ const seedData: Record<Language, Record<5 | 7 | 9, PuzzleSeed>> = {
         'Fourth row from the same ancient square.',
         'Final row that completes the square.'
       ],
-      downClues: [
-        'Column 1 mirrors row 1.',
-        'Column 2 mirrors row 2.',
-        'Column 3 mirrors row 3.',
-        'Column 4 mirrors row 4.',
-        'Column 5 mirrors row 5.'
-      ]
+      downClues: ['Column 1 mirrors row 1.', 'Column 2 mirrors row 2.', 'Column 3 mirrors row 3.', 'Column 4 mirrors row 4.', 'Column 5 mirrors row 5.']
     },
     7: {
       language: 'en',
@@ -57,9 +53,7 @@ const seedData: Record<Language, Record<5 | 7 | 9, PuzzleSeed>> = {
         'Wash lightly and then continue.',
         'What players are trying to find.'
       ],
-      downClues: [
-        'Column clue 1.', 'Column clue 2.', 'Column clue 3.', 'Column clue 4.', 'Column clue 5.', 'Column clue 6.', 'Column clue 7.'
-      ]
+      downClues: ['Column clue 1.', 'Column clue 2.', 'Column clue 3.', 'Column clue 4.', 'Column clue 5.', 'Column clue 6.', 'Column clue 7.']
     },
     9: {
       language: 'en',
@@ -150,7 +144,19 @@ const seedData: Record<Language, Record<5 | 7 | 9, PuzzleSeed>> = {
   }
 };
 
-export function buildPuzzle(language: Language, size: 5 | 7 | 9): GamePuzzle {
+function applyProfile(clues: string[], profile: ContentProfile): string[] {
+  if (profile === 'standard') {
+    return clues;
+  }
+
+  // Educational note:
+  // For MVP we currently reuse the same clue bank, but we still label profile output so the
+  // UI and API can already support family/kid data sources in a later milestone.
+  const prefix = profile === 'family' ? '[Family] ' : '[Kid] ';
+  return clues.map((clue) => `${prefix}${clue}`);
+}
+
+export function buildPuzzle(language: Language, size: 5 | 7 | 9, profile: ContentProfile = 'standard'): GamePuzzle {
   const seed = seedData[language][size];
   const flat = seed.across.join('').split('');
   const solutionTiles = flat.map((value, idx) => ({ id: `tile-${idx}`, value }));
@@ -167,8 +173,9 @@ export function buildPuzzle(language: Language, size: 5 | 7 | 9): GamePuzzle {
   return {
     language,
     size,
-    acrossClues: seed.acrossClues,
-    downClues: seed.downClues,
+    profile,
+    acrossClues: applyProfile(seed.acrossClues, profile),
+    downClues: applyProfile(seed.downClues, profile),
     solutionTiles,
     shuffledTiles
   };

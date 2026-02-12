@@ -25,33 +25,38 @@ def test_api_route_exists() -> None:
     assert_true("export async function GET" in text, "API GET route missing")
     assert_true("allowedLanguages" in text, "Language validation missing")
     assert_true("allowedSizes" in text, "Board size validation missing")
+    assert_true("allowedProfiles" in text, "Profile validation missing")
 
 
 def test_flaky_shuffle_guard_present() -> None:
     text = read("lib/game.ts")
-    assert_true("while (isSolved(shuffledTiles, solutionTiles) && attempts < 5)" in text,
-                "Anti-flaky shuffle guard missing")
+    assert_true(
+        "while (isSolved(shuffledTiles, solutionTiles) && attempts < 5)" in text,
+        "Anti-flaky shuffle guard missing",
+    )
 
 
 def test_next_image_used_for_tile_mode() -> None:
     text = read("components/SwapPuzzleGame.tsx")
     assert_true("import Image from 'next/image';" in text, "next/image import missing")
-    assert_true("<Image" in text and "unoptimized" in text,
-                "Image tile rendering not using next/image")
+    assert_true("<Image" in text and "unoptimized" in text, "Image tile rendering not using next/image")
 
 
 def test_board_size_options_present() -> None:
     text = read("components/SwapPuzzleGame.tsx")
-    assert_true("const boardSizes: Array<5 | 7 | 9> = [5, 7, 9];" in text,
-                "Board sizes 5/7/9 missing")
+    assert_true("const boardSizes: Array<5 | 7 | 9> = [5, 7, 9];" in text, "Board sizes 5/7/9 missing")
 
 
 def test_language_support_present() -> None:
     text = read("lib/game.ts")
-    # Ensure all required language keys exist in seed data
     for lang in ["en", "de", "fr", "es"]:
-        assert_true(re.search(rf"\n\s*{lang}:\s*{{", text) is not None,
-                    f"Language seed '{lang}' missing")
+        assert_true(re.search(rf"\n\s*{lang}:\s*{{", text) is not None, f"Language seed '{lang}' missing")
+
+
+def test_profile_and_zero_swap_options_present() -> None:
+    text = read("components/SwapPuzzleGame.tsx")
+    assert_true("failAtZero" in text and "continueAtZero" in text, "Zero-swap option controls missing")
+    assert_true("type ContentProfile" in read("lib/game.ts"), "Content profile type missing")
 
 
 def run() -> int:
@@ -61,6 +66,7 @@ def run() -> int:
         test_next_image_used_for_tile_mode,
         test_board_size_options_present,
         test_language_support_present,
+        test_profile_and_zero_swap_options_present,
     ]
 
     failures = 0
