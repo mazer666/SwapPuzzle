@@ -236,18 +236,6 @@ function applyProfile(clues: string[], profile: ContentProfile): string[] {
   return clues.map((clue) => clue.replace(/battle|war|weapon|risk|danger|violent/gi, 'play'));
 }
 
-function isSolvable(shuffled: Tile[], solution: Tile[]): boolean {
-  if (shuffled.length !== solution.length) return false;
-  const count = new Map<string, number>();
-  for (const tile of solution) count.set(tile.value, (count.get(tile.value) ?? 0) + 1);
-  for (const tile of shuffled) {
-    const left = (count.get(tile.value) ?? 0) - 1;
-    if (left < 0) return false;
-    count.set(tile.value, left);
-  }
-  return Array.from(count.values()).every((value) => value === 0);
-}
-
 function hasUniqueWordSet(words: string[]): boolean {
   return new Set(words).size === words.length;
 }
@@ -303,9 +291,6 @@ export function buildPuzzle(language: Language, size: 5 | 7 | 9, profile: Conten
     attempts += 1;
   }
 
-  if (!isSolvable(shuffledTiles, solutionTiles)) {
-    shuffledTiles = [...solutionTiles].reverse();
-  }
 
   const selectedEntries = seed.across.map((word, index) => ({
     word,
