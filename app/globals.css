@@ -256,7 +256,7 @@ button {
 
 .tile.selected { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2); }
 .tile.correct { background: #65d62f; border-color: #22a146; }
-.tile.locked { cursor: not-allowed; }
+.tile.locked { cursor: default; }
 .tile.blocked,
 .tile:disabled {
   background: #0f172a;

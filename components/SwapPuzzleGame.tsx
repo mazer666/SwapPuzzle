@@ -39,7 +39,7 @@ const defaultSettings: Settings = {
   profile: 'family',
   failAtZero: true,
   continueAtZero: false,
-  useBlockedCells: true
+  useBlockedCells: false
 };
 
 const copy: Dictionary = {
@@ -230,17 +230,34 @@ function buildStartMap(size: number, blocked: Set<number>): Map<number, StartInf
     const isAcrossStart = col === 0 || blocked.has(idx - 1);
     const isDownStart = row === 0 || blocked.has(idx - size);
 
-    if (!isAcrossStart && !isDownStart) continue;
+    const acrossLength = isAcrossStart
+      ? (() => {
+          let len = 0;
+          for (let c = col; c < size && !blocked.has(row * size + c); c += 1) len += 1;
+          return len;
+        })()
+      : 0;
+    const downLength = isDownStart
+      ? (() => {
+          let len = 0;
+          for (let r = row; r < size && !blocked.has(r * size + col); r += 1) len += 1;
+          return len;
+        })()
+      : 0;
+
+    const includeAcross = isAcrossStart && acrossLength > 1;
+    const includeDown = isDownStart && downLength > 1;
+    if (!includeAcross && !includeDown) continue;
 
     map.set(idx, {
       number: clueNo,
-      acrossIndex: isAcrossStart ? acrossIdx : null,
-      downIndex: isDownStart ? downIdx : null
+      acrossIndex: includeAcross ? acrossIdx : null,
+      downIndex: includeDown ? downIdx : null
     });
 
     clueNo += 1;
-    if (isAcrossStart) acrossIdx += 1;
-    if (isDownStart) downIdx += 1;
+    if (includeAcross) acrossIdx += 1;
+    if (includeDown) downIdx += 1;
   }
 
   return map;
