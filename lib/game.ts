@@ -78,21 +78,21 @@ const seedData: Record<Language, Record<5 | 7 | 9, PuzzleSeed>> = {
       language: 'de',
       size: 5,
       across: ['SMILE', 'HONEY', 'APPLE', 'TRAIN', 'BEACH'],
-      acrossClues: ['Lateinisches Wortquadrat Zeile 1.', 'Zeile 2 des klassischen Quadrats.', 'Palindrom in der Mitte.', 'Zeile 4 im Muster.', 'Abschlusszeile im Quadrat.'],
+      acrossClues: ['Wenn ein Rätsel plötzlich Sinn ergibt: dein Gesicht macht das.', 'Süßer goldener Brotaufstrich von fleißigen Bienen.', 'Klassischer Obst-Star; angeblich gut gegen Arztbesuche.', 'Langes Fahrzeug auf Schienen.', 'Sonnige Küste mit Sand und Wellen.'],
       downClues: ['Spalte 1.', 'Spalte 2.', 'Spalte 3.', 'Spalte 4.', 'Spalte 5.']
     },
     7: {
       language: 'de',
       size: 7,
       across: ['ALGEBRA', 'LANTERN', 'GARDENS', 'SUNRISE', 'HARMONY', 'POPCORN', 'ANSWERS'],
-      acrossClues: ['Mathebereich mit Symbolen.', 'Tragbare Lichtquelle.', 'Mehrzahl von Garten.', 'Aufrichtig und ernst.', 'Bronzefarben.', 'Leicht ausspülen.', 'Gesuchte Lösungen.'],
+      acrossClues: ['Mathebereich mit Symbolen und Gleichungen.', 'Tragbare Lichtquelle für dunkle Wege.', 'Mehrzahl von Garten.', 'Tagesbeginn, wenn die Sonne auftritt.', 'Wenn Töne gut zusammenklingen.', 'Kino-Snack, der laut knistert.', 'Das, wonach Spielende suchen.'],
       downClues: ['Spalte 1.', 'Spalte 2.', 'Spalte 3.', 'Spalte 4.', 'Spalte 5.', 'Spalte 6.', 'Spalte 7.']
     },
     9: {
       language: 'de',
       size: 9,
       across: ['NOTEBOOKS', 'CHOCOLATE', 'PINEAPPLE', 'BUTTERFLY', 'WATERFALL', 'KEYBOARDS', 'MOONLIGHT', 'RAINDROPS', 'STARLIGHT'],
-      acrossClues: ['Notizbücher in Mehrzahl.', 'Jemand mit Papierfaltkunst.', 'Strategisch geprägt.', 'Höhenlage.', 'Im Gleichgewicht.', 'Kontaktaufnahme.', 'Stilistisch geschriebener Herbstmonat.', 'Bahnhalteorte.', 'Zusammenspiel mit Mehrwert.'],
+      acrossClues: ['Notizhefte im Plural.', 'Süße Tafel, die in der Sonne schmilzt.', 'Tropenfrucht mit stacheliger Krone.', 'Bunter Flattergast im Garten.', 'Wasser stürzt stufenweise in die Tiefe.', 'Tipptools im Plural fürs Schreiben und Spielen.', 'Silbernes Nachtlicht über der Stadt.', 'Kleine Regentropfen im Beat des Wetters.', 'Leuchten am Himmel, das Wünsche startet.'],
       downClues: ['Spalte 1.', 'Spalte 2.', 'Spalte 3.', 'Spalte 4.', 'Spalte 5.', 'Spalte 6.', 'Spalte 7.', 'Spalte 8.', 'Spalte 9.']
     }
   },
@@ -101,21 +101,21 @@ const seedData: Record<Language, Record<5 | 7 | 9, PuzzleSeed>> = {
       language: 'fr',
       size: 5,
       across: ['SMILE', 'HONEY', 'APPLE', 'TRAIN', 'BEACH'],
-      acrossClues: ['Carré latin, ligne 1.', 'Carré latin, ligne 2.', 'Palindrome central.', 'Carré latin, ligne 4.', 'Carré latin, ligne 5.'],
+      acrossClues: ['Ce que fait ton visage quand la solution arrive enfin.', 'Douceur dorée faite par les abeilles.', 'Fruit classique qui croque sous la dent.', 'Long véhicule qui roule sur des rails.', 'Côte ensoleillée entre sable et vagues.'],
       downClues: ['Colonne 1.', 'Colonne 2.', 'Colonne 3.', 'Colonne 4.', 'Colonne 5.']
     },
     7: {
       language: 'fr',
       size: 7,
       across: ['ALGEBRA', 'LANTERN', 'GARDENS', 'SUNRISE', 'HARMONY', 'POPCORN', 'ANSWERS'],
-      acrossClues: ['Branche des maths.', 'Lumière portable.', 'Espaces de fleurs.', 'Sincère et sérieux.', 'Teinte bronze.', 'Rincer puis continuer.', 'Ce que le joueur cherche.'],
+      acrossClues: ['Branche des maths avec symboles et équations.', 'Source de lumière portable.', 'Espaces avec fleurs et plantes.', 'Début du jour quand le soleil se lève.', 'Quand des notes sonnent bien ensemble.', 'Snack de cinéma qui fait du bruit.', 'Ce que les joueurs veulent trouver.'],
       downClues: ['Colonne 1.', 'Colonne 2.', 'Colonne 3.', 'Colonne 4.', 'Colonne 5.', 'Colonne 6.', 'Colonne 7.']
     },
     9: {
       language: 'fr',
       size: 9,
       across: ['NOTEBOOKS', 'CHOCOLATE', 'PINEAPPLE', 'BUTTERFLY', 'WATERFALL', 'KEYBOARDS', 'MOONLIGHT', 'RAINDROPS', 'STARLIGHT'],
-      acrossClues: ['Cahiers au pluriel.', 'Artisan du pliage papier.', 'À caractère stratégique.', 'Hauteur relative.', 'Stable et équilibré.', 'Action de tendre la main.', 'Mois d’automne stylisé.', 'Lieux d’arrêt des trains.', 'Effets combinés positifs.'],
+      acrossClues: ['Cahiers au pluriel pour idées et esquisses.', 'Douceur qui fond vite quand il fait chaud.', 'Fruit tropical à couronne piquante.', 'Danseuse ailée des jardins.', 'Eau qui tombe en marches naturelles.', 'Outils de frappe au pluriel.', 'Lueur de la nuit qui rend tout cinématographique.', 'Petits battements d’eau les jours de pluie.', 'Éclat du ciel qui inspire les vœux.'],
       downClues: ['Colonne 1.', 'Colonne 2.', 'Colonne 3.', 'Colonne 4.', 'Colonne 5.', 'Colonne 6.', 'Colonne 7.', 'Colonne 8.', 'Colonne 9.']
     }
   },
@@ -124,21 +124,21 @@ const seedData: Record<Language, Record<5 | 7 | 9, PuzzleSeed>> = {
       language: 'es',
       size: 5,
       across: ['SMILE', 'HONEY', 'APPLE', 'TRAIN', 'BEACH'],
-      acrossClues: ['Cuadrado latino fila 1.', 'Cuadrado latino fila 2.', 'Palíndromo central.', 'Cuadrado latino fila 4.', 'Cuadrado latino fila 5.'],
+      acrossClues: ['Lo que hace tu cara cuando por fin encaja el puzzle.', 'Dulce dorado hecho por abejas trabajadoras.', 'Fruta clásica con crujido famoso.', 'Vehículo largo que va por rieles.', 'Costa soleada con arena y olas.'],
       downClues: ['Columna 1.', 'Columna 2.', 'Columna 3.', 'Columna 4.', 'Columna 5.']
     },
     7: {
       language: 'es',
       size: 7,
       across: ['ALGEBRA', 'LANTERN', 'GARDENS', 'SUNRISE', 'HARMONY', 'POPCORN', 'ANSWERS'],
-      acrossClues: ['Rama matemática.', 'Fuente de luz portátil.', 'Espacios con flores.', 'Sincero y serio.', 'Tono bronce.', 'Enjuagar y seguir.', 'Lo que busca el jugador.'],
+      acrossClues: ['Rama matemática con símbolos y ecuaciones.', 'Fuente de luz portátil.', 'Espacios con flores y plantas.', 'Inicio del día cuando sale el sol.', 'Cuando las notas suenan en armonía.', 'Snack de cine que suena al morder.', 'Lo que el jugador quiere encontrar.'],
       downClues: ['Columna 1.', 'Columna 2.', 'Columna 3.', 'Columna 4.', 'Columna 5.', 'Columna 6.', 'Columna 7.']
     },
     9: {
       language: 'es',
       size: 9,
       across: ['NOTEBOOKS', 'CHOCOLATE', 'PINEAPPLE', 'BUTTERFLY', 'WATERFALL', 'KEYBOARDS', 'MOONLIGHT', 'RAINDROPS', 'STARLIGHT'],
-      acrossClues: ['Cuadernos en plural.', 'Persona experta en origami.', 'De carácter estratégico.', 'Altitud sobre referencia.', 'En equilibrio.', 'Acción de acercamiento.', 'Mes otoñal escrito con estilo.', 'Paradas de tren.', 'Efecto combinado superior.'],
+      acrossClues: ['Cuadernos en plural para ideas y bocetos.', 'Dulce que se derrite si esperas demasiado.', 'Fruta tropical con corona de pinchos.', 'Bailarina alada del jardín.', 'Agua que cae en escalones naturales.', 'Herramientas para escribir y jugar, en plural.', 'Brillo nocturno que vuelve todo cinematográfico.', 'Pequeños golpes de agua en la lluvia.', 'Destello del cielo que invita a pedir deseos.'],
       downClues: ['Columna 1.', 'Columna 2.', 'Columna 3.', 'Columna 4.', 'Columna 5.', 'Columna 6.', 'Columna 7.', 'Columna 8.', 'Columna 9.']
     }
   }
@@ -197,9 +197,12 @@ export function swapTiles(tiles: Tile[], a: number, b: number): Tile[] {
   return next;
 }
 
-export function isSolved(current: Tile[], solution: Tile[]): boolean {
+export function isSolved(current: Tile[], solution: Tile[], blocked: Set<number> = new Set()): boolean {
   if (current.length !== solution.length) return false;
-  return current.every((tile, index) => tile.value === solution[index].value);
+  return current.every((tile, index) => {
+    if (blocked.has(index)) return true;
+    return tile.value === solution[index].value;
+  });
 }
 
 export function createImageToken(letter: string): string {

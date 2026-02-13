@@ -6,6 +6,7 @@ import {
   buildPuzzle,
   createImageToken,
   swapTiles,
+  isSolved,
   type ContentProfile,
   type GamePuzzle,
   type Language,
@@ -256,14 +257,7 @@ export function SwapPuzzleGame() {
   const blocked = useMemo(() => blockedIndexes(settings.size, settings.useBlockedCells), [settings.size, settings.useBlockedCells]);
   const startMap = useMemo(() => buildStartMap(settings.size, blocked), [settings.size, blocked]);
 
-  const solved = useMemo(
-    () =>
-      tiles.every((tile, index) => {
-        if (blocked.has(index)) return true;
-        return tile.value === puzzle.solutionTiles[index]?.value;
-      }),
-    [blocked, puzzle.solutionTiles, tiles]
-  );
+  const solved = useMemo(() => isSolved(tiles, puzzle.solutionTiles, blocked), [blocked, puzzle.solutionTiles, tiles]);
 
   useEffect(() => {
     const loaded = readSettings();
@@ -337,8 +331,7 @@ export function SwapPuzzleGame() {
 
   useEffect(() => {
     setImageCells(pickImageCells(tiles.length, blocked));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blocked.size]);
+  }, [tiles.length, blocked]);
 
   const canPlay = !gameOver && !solved && (settings.difficulty === 'relaxed' || swapsLeft > 0 || settings.continueAtZero);
 
