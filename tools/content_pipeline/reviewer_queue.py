@@ -36,19 +36,21 @@ class ReviewDecision:
 
 
 def apply_decision(item: QueueItem, decision: ReviewDecision) -> QueueItem:
-    if decision.action == "approve":
-        item.status = "approved"
-        return item
+    action_to_status = {
+        "approve": "approved",
+        "request_edit": "draft",
+        "escalate": "reviewed",
+        "reject": "deprecated",
+        "deprecate": "deprecated",
+    }
 
-    if decision.action in {"request_edit", "reject", "deprecate", "escalate"}:
-        if decision.reason_code not in REASON_CODES:
-            raise ValueError("invalid_reason_code")
-        if decision.action == "request_edit":
-            item.status = "draft"
-        elif decision.action == "escalate":
-            item.status = "reviewed"
-        else:
-            item.status = "deprecated"
-        return item
+    new_status = action_to_status.get(decision.action)
+    if new_status is None:
+        raise ValueError("invalid_action")
 
-    raise ValueError("invalid_action")
+    if decision.action != "approve":
+        if decision.reason_code is None or decision.reason_code not in REASON_CODES:
+            raise ValueError("A valid reason_code is required for non-approve actions")
+
+    item.status = new_status
+    return item
