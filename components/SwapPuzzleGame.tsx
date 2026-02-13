@@ -54,6 +54,7 @@ const copy: Dictionary = {
     solved: 'Solved! 🎉',
     gameOver: 'No swaps left. Puzzle failed.',
     hint: 'Hint',
+    nextClue: 'Next clue',
     leaderboard: 'Local best score',
     profile: 'Profile',
     failAtZero: 'Lose when swaps reach zero',
@@ -75,6 +76,7 @@ const copy: Dictionary = {
     solved: 'Gelöst! 🎉',
     gameOver: 'Keine Züge mehr. Runde verloren.',
     hint: 'Tipp',
+    nextClue: 'Nächster Hinweis',
     leaderboard: 'Lokale Bestpunktzahl',
     profile: 'Profil',
     failAtZero: 'Bei 0 Zügen verlieren',
@@ -96,6 +98,7 @@ const copy: Dictionary = {
     solved: 'Résolu ! 🎉',
     gameOver: 'Plus d’échanges. Partie perdue.',
     hint: 'Indice',
+    nextClue: 'Indice suivant',
     leaderboard: 'Meilleur score local',
     profile: 'Profil',
     failAtZero: 'Perdre à zéro échange',
@@ -117,6 +120,7 @@ const copy: Dictionary = {
     solved: '¡Resuelto! 🎉',
     gameOver: 'Sin intercambios. Partida perdida.',
     hint: 'Pista',
+    nextClue: 'Siguiente pista',
     leaderboard: 'Mejor puntuación local',
     profile: 'Perfil',
     failAtZero: 'Perder con cero intercambios',
@@ -131,6 +135,7 @@ const copy: Dictionary = {
 
 const tileModeOptions: TileMode[] = ['letters', 'images'];
 const boardSizes: Array<5 | 7 | 9> = [5, 7, 9];
+const BLOCKED_5X5_CELLS = [0, 4, 20] as const; // top-left, top-right, bottom-left
 
 function swapsForDifficulty(difficulty: Difficulty, size: number): number {
   if (difficulty === 'relaxed') return 999;
@@ -139,8 +144,9 @@ function swapsForDifficulty(difficulty: Difficulty, size: number): number {
 }
 
 function blockedIndexes(size: number, enabled: boolean): Set<number> {
+  // Blocked cells are currently only supported on 5x5 grids.
   if (!enabled || size !== 5) return new Set();
-  return new Set([0, 4, 20]);
+  return new Set(BLOCKED_5X5_CELLS);
 }
 
 function saveBestScore(language: Language, score: number) {
@@ -274,21 +280,15 @@ export function SwapPuzzleGame() {
 
     if (isStartAcross || isStartDown) {
       const hasBoth = isStartAcross && isStartDown;
-      const nextOrientation = hasBoth
-        ? activeClueIndex === 0 && activeClueOrientation === 'across'
-          ? 'down'
-          : 'across'
-        : isStartAcross
-          ? 'across'
-          : 'down';
 
-      const nextIndex = nextOrientation === 'across' ? row : col;
-
-      if (activeClueIndex === nextIndex && activeClueOrientation === nextOrientation && hasBoth) {
-        setActiveClueOrientation(activeClueOrientation === 'across' ? 'down' : 'across');
+      if (hasBoth && activeClueIndex === 0) {
+        setActiveClueOrientation((prev) => (prev === 'across' ? 'down' : 'across'));
+      } else if (isStartAcross) {
+        setActiveClueOrientation('across');
+        setActiveClueIndex(row);
       } else {
-        setActiveClueOrientation(nextOrientation);
-        setActiveClueIndex(nextIndex);
+        setActiveClueOrientation('down');
+        setActiveClueIndex(col);
       }
     }
 
@@ -314,7 +314,7 @@ export function SwapPuzzleGame() {
     if (!touch) return;
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
     const tileElement = target?.closest('[data-tile-index]') as HTMLElement | null;
-    const to = Number(tileElement?.dataset.tileIndex ?? Number.NaN);
+    const to = Number(tileElement?.dataset.tileIndex);
     if (!Number.isNaN(to)) {
       executeSwap(dragTile, to);
     }
@@ -325,10 +325,12 @@ export function SwapPuzzleGame() {
   const safeClueIndex = Math.min(activeClueIndex, clueList.length - 1);
 
   const selectPreviousClue = () => {
+    if (clueList.length === 0) return;
     setActiveClueIndex((prev) => (prev - 1 + clueList.length) % clueList.length);
   };
 
   const selectNextClue = () => {
+    if (clueList.length === 0) return;
     setActiveClueIndex((prev) => (prev + 1) % clueList.length);
   };
 
@@ -494,7 +496,7 @@ export function SwapPuzzleGame() {
           </button>
         </div>
         <button className="secondary" type="button" onClick={selectNextClue}>
-          {t.hint}
+          {t.nextClue}
         </button>
       </section>
 
