@@ -397,6 +397,20 @@ export function SwapPuzzleGame() {
     if (!blocked.has(index) && !isLocked(index)) {
       setDragTile(index);
     }
+    setDragTile(null);
+  };
+
+  const clueList = activeClueOrientation === 'across' ? puzzle.acrossClues : puzzle.downClues;
+  const safeClueIndex = Math.min(activeClueIndex, clueList.length - 1);
+
+  const selectPreviousClue = () => {
+    if (clueList.length === 0) return;
+    setActiveClueIndex((prev) => (prev - 1 + clueList.length) % clueList.length);
+  };
+
+  const selectNextClue = () => {
+    if (clueList.length === 0) return;
+    setActiveClueIndex((prev) => (prev + 1) % clueList.length);
   };
 
   const handleTouchEnd: TouchEventHandler<HTMLButtonElement> = (event) => {
